@@ -1,0 +1,40 @@
+{
+  "development": {
+    "check-commands": [
+      "npm run lint",
+      "npm run test",
+      "npm run build"
+    ],
+    "lint-checks": [
+      "npm run typecheck"
+    ],
+    "quality-gates": {
+      "test-thresholds": 80
+    },
+    "verification-methods": {
+      "javascript": "run npm run test -- --ci",
+      "python": "run python -m pytest tests/ --cov"
+    }
+  },
+  "deploy": {
+    "configurations": {
+      "cicd-repos": {
+        "provider": "CICD Platform",
+        "repos": {
+          "team1": {
+            "branch": "main",
+            "deployments": ["main", "staging", "uat"],
+            "base-url": "https://main.1234567890.us-east-1.amazonaws.com",
+            "infrastructure-type": "Serverless",
+            "identifier": "Vercel",
+            "owners": ["team1@company.com"],
+            "pipeline": "vercel",
+            "source": "GitHub",
+            "destination": "Vercel",
+            "regional-strategy": "Multi-region"
+          }
+        }
+      }
+    }
+  }
+}

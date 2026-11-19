@@ -1,0 +1,130 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Geist:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", "Geist", system-ui, sans-serif;
+  --font-display: "Plus Jakarta Sans", "Geist", sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+
+  --animate-fade-up: fadeUp 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
+  --animate-shake: shake 0.45s ease-in-out 3;
+  --animate-red-pulse: redPulse 1.6s ease-in-out infinite;
+  --animate-gold-pulse: goldPulse 2.2s ease-in-out infinite;
+  --animate-scan: scanY 0.9s ease-in-out infinite;
+  --animate-mesh: meshDrift 18s ease-in-out infinite alternate;
+  --animate-float: floaty 6s ease-in-out infinite;
+  --animate-blink: blinkDot 1.2s ease-in-out infinite;
+  --animate-breathe: breathe 3.2s ease-in-out infinite;
+}
+
+@keyframes fadeUp { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes shake { 0%, 100% { transform: translateX(0); } 20% { transform: translateX(-2.5px); } 40% { transform: translateX(2.5px); } 60% { transform: translateX(-2px); } 80% { transform: translateX(2px); } }
+@keyframes redPulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.35); } 50% { box-shadow: 0 0 0 9px rgba(239, 68, 68, 0); } }
+@keyframes goldPulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.55; } }
+@keyframes scanY { 0%, 100% { top: 0; } 50% { top: 100%; } }
+@keyframes meshDrift { 0% { background-position: 0% 0%; } 100% { background-position: 100% 100%; } }
+@keyframes floaty { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+@keyframes blinkDot { 0%, 80%, 100% { opacity: 0.3; transform: translateY(0); } 40% { opacity: 1; transform: translateY(-3px); } }
+@keyframes breathe { 0%, 100% { box-shadow: 0 0 0 0 rgba(165, 180, 252, 0.45); } 50% { box-shadow: 0 0 22px 3px rgba(165, 180, 252, 0.45); } }
+@keyframes confettiFly { 0% { opacity: 1; transform: translate(0, 0) rotate(0deg); } 100% { opacity: 0; transform: translate(var(--dx, 24px), var(--dy, -64px)) rotate(540deg); } }
+@keyframes rippleFlash { to { transform: scale(2.4); opacity: 0.7; } }
+
+/* ============ FinKavach Design Tokens ============ */
+:root {
+  --kavach-navy: #0F172A;
+  --kavach-gold: #FBBF24;
+  --shield-teal: #0D9488;
+  --shield-teal-hi: #5EEAD4;
+  --surgeon-emerald: #059669;
+  --surgeon-emerald-hi: #34D399;
+  --chat-indigo: #6366F1;
+  --chat-indigo-hi: #A5B4FC;
+  --bg: #FFFFFF;
+  --surface: #FFFFFF;
+  --surface-muted: #F1F5F9;
+  --text-primary: #0F172A;
+  --text-secondary: #64748B;
+  --success: #10B981;
+  --warning: #F59E0B;
+  --danger: #EF4444;
+  --grad-shield: linear-gradient(135deg, #0D9488, #5EEAD4);
+  --grad-surgeon: linear-gradient(135deg, #059669, #34D399);
+  --grad-chat: linear-gradient(135deg, #6366F1, #A5B4FC);
+  --grad-gold: linear-gradient(135deg, #FBBF24, #FDE68A);
+  --font-display: "Plus Jakarta Sans", "Geist", sans-serif;
+  --font-sans: "Inter", "Geist", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+}
+
+/* ---- Curated themes (8) ---- */
+[data-theme='kavach-classic'] { --bg: #FFFFFF; --surface: #FFFFFF; --surface-muted: #F1F5F9; --text-primary: #0F172A; --text-secondary: #64748B; --brand: #0F172A; --accent: #FBBF24; }
+[data-theme='midnight-shield'] { --bg: #020617; --surface: #0F172A; --surface-muted: #1E293B; --text-primary: #E2E8F0; --text-secondary: #94A3B8; --brand: #0F172A; --accent: #2DD4BF; }
+[data-theme='surgeon-mint'] { --bg: #ECFDF5; --surface: #FFFFFF; --surface-muted: #D1FAE5; --text-primary: #064E3B; --text-secondary: #047857; --brand: #059669; --accent: #34D399; }
+[data-theme='royal-india'] { --bg: #FFFBEB; --surface: #FFFFFF; --surface-muted: #FEF3C7; --text-primary: #3B0764; --text-secondary: #7C3AED; --brand: #4C1D95; --accent: #FF9933; }
+[data-theme='hacker-shield'] { --bg: #0A0A0A; --surface: #111827; --surface-muted: #1F2937; --text-primary: #E5E7EB; --text-secondary: #9CA3AF; --brand: #111827; --accent: #22C55E; }
+[data-theme='sunrise-optimist'] { --bg: #FFF7ED; --surface: #FFFFFF; --surface-muted: #FFEDD5; --text-primary: #7C2D12; --text-secondary: #C2410C; --brand: #F97316; --accent: #FCD34D; }
+[data-theme='monochrome-pro'] { --bg: #FAFAFA; --surface: #FFFFFF; --surface-muted: #F4F4F5; --text-primary: #18181B; --text-secondary: #71717A; --brand: #18181B; --accent: #52525B; }
+[data-theme='deep-ocean'] { --bg: #082F49; --surface: #0C4A6E; --surface-muted: #155E75; --text-primary: #E0F2FE; --text-secondary: #7DD3FC; --brand: #0C4A6E; --accent: #22D3EE; }
+[data-theme='indigo-night'] { --bg: #0E1022; --surface: #171A33; --surface-muted: #262B4D; --text-primary: #E8E6F3; --text-secondary: #A5B4FC; --brand: #4338CA; --accent: #F59E3B; --kavach-gold: #F59E3B; }
+[data-theme='indigo-dawn'] { --bg: #F6F5FB; --surface: #FFFFFF; --surface-muted: #E6E4F2; --text-primary: #14122B; --text-secondary: #5E5B80; --brand: #4338CA; --accent: #D97706; --kavach-gold: #F59E3B; }
+
+@layer base {
+  * { -webkit-tap-highlight-color: transparent; }
+  html, body { overscroll-behavior-y: contain; }
+  body {
+    background: linear-gradient(180deg, var(--bg) 0%, var(--surface-muted) 420px) fixed;
+    background-color: var(--bg);
+    color: var(--text-primary);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    position: relative; overflow: hidden; border-radius: 0.5rem;
+    background: linear-gradient(135deg, var(--kavach-navy), #1E293B);
+    color: #fff; font-weight: 600; padding-top: 0.625rem; padding-bottom: 0.625rem;
+    padding-left: 1rem; padding-right: 1rem; font-size: 0.875rem; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+  }
+  .btn-gold {
+    position: relative; overflow: hidden; border-radius: 0.5rem;
+    background: linear-gradient(135deg, var(--kavach-gold), #FDE68A);
+    color: var(--kavach-navy); font-weight: 700; padding-top: 0.625rem; padding-bottom: 0.625rem;
+    padding-left: 1rem; padding-right: 1rem; font-size: 0.875rem; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.25);
+  }
+  .btn-outline { background: var(--surface); border: 1px solid #e2e8f0; border-radius: 0.5rem; color: #334155; font-weight: 500; padding-top: 0.5rem; padding-bottom: 0.5rem; padding-left: 0.75rem; padding-right: 0.75rem; font-size: 0.875rem; box-shadow: 0 1px 2px rgb(0 0 0 / 0.05); }
+  .btn-ghost { color: #475569; padding-top: 0.5rem; padding-bottom: 0.5rem; padding-left: 0.5rem; padding-right: 0.5rem; border-radius: 0.5rem; font-weight: 500; }
+  .card { background: var(--surface); border: 1px solid #e2e8f0; border-radius: 0.75rem; box-shadow: 0 4px 14px -6px rgb(15 23 42 / 0.10); padding: 0.875rem; display: flex; flex-direction: column; gap: 0.75rem; }
+  .stat { font-family: var(--font-mono); font-weight: 500; font-size: 1.25rem; color: var(--text-primary); }
+  .text-display { font-family: var(--font-display); }
+  .text-mono-rupee { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+}
+
+/* Ripple on tap (CSS ::after flash) */
+.btn-primary::after, .btn-gold::after, .btn-ghost::after {
+  content: ''; position: absolute; inset: 0; border-radius: inherit;
+  background: radial-gradient(circle at center, rgba(255, 255, 255, 0.45) 0%, transparent 60%);
+  transform: scale(0); opacity: 0; pointer-events: none;
+}
+.btn-primary:active::after, .btn-gold:active::after, .btn-ghost:active::after { animation: rippleFlash 0.4s ease-out; }
+
+@keyframes fadeDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+.toast-in { animation: fadeDown 0.25s ease both; }
+
+/* Safe verdict confetti particles */
+.confetti-piece { animation: confettiFly 1.1s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
+
+/* Staggered fade-in for lists */
+.stagger > * { animation: fadeUp 0.35s cubic-bezier(0.22, 1, 0.36, 1) both; }
+.stagger > *:nth-child(1) { animation-delay: 0.02s; }
+.stagger > *:nth-child(2) { animation-delay: 0.07s; }
+.stagger > *:nth-child(3) { animation-delay: 0.12s; }
+.stagger > *:nth-child(4) { animation-delay: 0.17s; }
+.stagger > *:nth-child(5) { animation-delay: 0.22s; }
+.stagger > *:nth-child(n + 6) { animation-delay: 0.27s; }
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
+}

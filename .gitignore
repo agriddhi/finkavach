@@ -1,0 +1,4 @@
+﻿vite_stdout.log
+vite_stderr.log
+dist/
+node_modules/
