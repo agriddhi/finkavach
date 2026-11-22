@@ -31,8 +31,6 @@ export function CDCheckerUpload() {
       setPreview(parsed)
       const explain = await callLLM(
         `Explain these billing items in 5 words each and flag the suspicious ones:\n` + parsed.rows.slice(0, 25).map((r) => `${r.description} (${r.amount})`).join('\n'),
-        'gpt-4o-mini',
-        '',
       )
       showToast('info', 'Explained' + (explain ? `: ${explain.slice(0, 200)}` : ''))
     } catch {

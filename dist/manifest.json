@@ -1,6 +1,13 @@
 {
-  "name": "FinKavach",
+  "id": "/",
+  "name": "FinKavach AI — Tax & Money Planner",
   "short_name": "FinKavach",
+  "description": "Compare tax regimes, find deductions and guard against scams — in plain language.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "theme_color": "#14203A",
+  "background_color": "#FAF7F0",
   "icons": [
     {
       "src": "/favicon-192.png",
@@ -12,10 +19,13 @@
       "src": "/favicon-512.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
+    },
+    {
+      "src": "/favicon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
     }
-  ],
-  "theme_color": "#059669",
-  "background_color": "#F8FAFC",
-  "display": "standalone"
+  ]
 }

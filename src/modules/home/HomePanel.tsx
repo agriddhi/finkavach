@@ -1,153 +1,212 @@
-import { useMemo } from 'react'
-import { motion } from 'framer-motion'
-import { TrendingUp, ArrowRight, Sparkles, Shield, Scale, BookOpen, IndianRupee } from 'lucide-react'
+import { useEffect, useMemo, useState } from 'react'
+import { PiggyBank, ChevronRight, Check, Lightbulb, ArrowRight, ShieldCheck } from 'lucide-react'
 import { HeroStat } from '@/modules/ui/widgets/HeroStat'
-import { Card } from '@/modules/ui/widgets/Table'
 import { ToolPrefsClass } from '@/modules/data/UserPreferences'
-import { TaxEngine } from '@/modules/surgeon/TaxEngine'
+import { formatINR, getFinBindings, quoteOfTheDay } from '@/modules/finance/format'
+import type { ModeKey } from '@/modules/ui/widgets/ModeSwitcher'
 
-const ACTIONS = [
-  { icon: Scale, title: 'Compare Regimes', sub: 'Old vs New', mode: 'compare' as const },
-  { icon: Sparkles, title: 'Ask AI Questions', sub: 'Tax & savings', mode: 'chat' as const },
-  { icon: IndianRupee, title: 'Plan Your Savings', sub: '80C, NPS, HRA', mode: 'taxes' as const },
-  { icon: BookOpen, title: 'Learn Tax Basics', sub: 'Guides & terms', mode: 'learn' as const },
+const FEATURES: Array<{ title: string; desc: string; mode?: ModeKey; ai?: boolean }> = [
+  { title: 'Compare Regimes', desc: 'Old vs New, side by side.', mode: 'compare' },
+  { title: 'Ask AI Questions', desc: 'Tax & savings, explained.', ai: true },
+  { title: 'Deduction Finder', desc: '80C, 80D, NPS and HRA.', mode: 'taxes' },
+  { title: 'Learn Tax Basics', desc: 'Guides & plain language.', mode: 'learn' },
 ]
 
-export function HomePanel(props: { onAskAI: (preset?: string) => void; setMode: (m: any) => void }) {
+const CARD_SHADOW = '0 1px 2px rgba(20,32,58,0.05)'
+
+export function HomePanel(props: { onAskAI: (preset?: string) => void; setMode: (m: ModeKey) => void }) {
   const prefs = useMemo(() => new ToolPrefsClass().fromLocalStorage(), [])
-  const annual = Math.max(0, prefs.salary) * 100000
-  const { savings, old, new: nu } = useMemo(() => TaxEngine.compare(annual), [annual])
-  const diff = Math.max(0, Math.abs(old.tax - nu.tax))
+  const b = useMemo(() => getFinBindings(prefs), [prefs])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    const t = setTimeout(() => setLoading(false), 350)
+    return () => clearTimeout(t)
+  }, [])
+
+  const hasData = b.salaryBase > 0
+
+  if (!hasData) {
+    return (
+      <div className="rounded-[10px] p-8 text-center" style={{ background: 'var(--surface)', border: '1px solid var(--border)', boxShadow: CARD_SHADOW }}>
+        <img src="/img/empty-plant.svg" alt="" aria-hidden="true" className="mx-auto h-20 w-20 mb-3" onError={(e) => { e.currentTarget.style.display = 'none' }} />
+        <h2 className="font-display font-bold text-xl" style={{ color: 'var(--text-primary)' }}>Add your salary to see your savings</h2>
+        <p className="text-sm mt-1" style={{ color: 'var(--text-secondary)' }}>Salary in, regime maths out — it all appears here.</p>
+      </div>
+    )
+  }
+
+  const recommendedRegime = b.recommendedRegime // 'old' | 'new'
+  const equal = b.savings === 0
+  const showRec = !equal
 
   return (
-    <div className="space-y-6">
-      {/* Hero banner */}
-      <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} className="relative rounded-3xl overflow-hidden p-8" style={{ background: 'linear-gradient(135deg, #1E1B4B 0%, #312E81 50%, #4338CA 100%)', border: '1px solid rgba(165,180,252,0.2)' }}>
-        <div className="absolute inset-0 pointer-events-none" style={{ background: 'radial-gradient(ellipse at 80% 20%, rgba(251,191,36,0.25), transparent 60%)' }} />
-        <svg className="absolute bottom-0 left-0 right-0 w-full h-24 opacity-30" viewBox="0 0 1200 100" preserveAspectRatio="none" aria-hidden>
-          <path d="M0 100 L0 60 L200 40 L400 70 L600 30 L800 55 L1000 25 L1200 60 L1200 100 Z" fill="#4338CA" opacity="0.6" />
-          <path d="M0 100 L0 70 L300 50 L600 75 L900 45 L1200 70 L1200 100 Z" fill="#1E1B4B" opacity="0.7" />
-        </svg>
-        <div className="relative z-10 max-w-2xl">
-          <h2 className="font-display font-extrabold text-3xl tracking-tight" style={{ color: '#F1F2FA' }}>
-            Let your money <span style={{ color: '#4338CA', textDecoration: 'underline', textDecorationColor: '#FBBF24', textUnderlineOffset: '6px' }}>work harder</span> for you
-          </h2>
-          <p className="mt-2 text-sm" style={{ color: 'rgba(241,242,250,0.7)' }}>Compare regimes, find deductions, and switch with confidence — all in one place.</p>
-          <button onClick={() => props.setMode('compare')} className="mt-4 rounded-xl px-5 py-2.5 text-sm font-bold flex items-center gap-2" style={{ background: 'linear-gradient(135deg, #FBBF24, #FDE68A)', color: '#0F172A', boxShadow: '0 8px 20px -8px rgba(245,158,11,0.55)' }}>
-            Find Your Best Regime <ArrowRight className="h-4 w-4" />
-          </button>
-          <div className="mt-4 flex gap-6 text-[10px] font-semibold tracking-widest" style={{ color: 'rgba(241,242,250,0.5)' }}>
-            <span>LOWER TAXES</span><span>BIGGER DREAMS</span><span>BRIGHTER YOU</span>
-          </div>
-        </div>
-      </motion.div>
-
-      {/* Savings card */}
-      <Card>
-        <div className="flex flex-col sm:flex-row sm:items-center gap-4">
-          <div className="flex items-center gap-3">
-            <span className="h-12 w-12 rounded-2xl flex items-center justify-center" style={{ background: 'rgba(251,191,36,0.12)' }}>
-              <span className="text-2xl">🐷</span>
-            </span>
-            <div>
-              <p className="text-xs font-semibold" style={{ color: 'var(--text-2)' }}>You save</p>
-              <HeroStat value={Math.max(0, savings)} prefix="₹" />
-              <p className="text-[11px] font-medium" style={{ color: 'var(--text-2)' }}>Estimated yearly tax savings</p>
-            </div>
-          </div>
-          <div className="sm:ml-auto flex items-center gap-4">
-            <div className="relative h-20 w-20 shrink-0">
-              <svg viewBox="0 0 100 100" className="h-full w-full -rotate-90">
-                <circle cx="50" cy="50" r="40" fill="none" stroke="var(--surface-muted)" strokeWidth="8" />
-                <circle cx="50" cy="50" r="40" fill="none" stroke="#FBBF24" strokeWidth="8" strokeDasharray={`${Math.min(1, savings / Math.max(1, annual)) * 2 * Math.PI * 40} ${2 * Math.PI * 40}`} strokeLinecap="round" />
-              </svg>
-              <div className="absolute inset-0 flex items-center justify-center text-xs font-bold" style={{ color: '#FBBF24' }}>
-                {Math.round((savings / Math.max(1, annual)) * 100)}% of salary
+    <div className="grid lg:grid-cols-[1fr_300px] gap-5 items-start">
+      <div className="space-y-5 min-w-0">
+        {/* (1) Hero — editorial split: headline left, taped photo right (strip on mobile) */}
+        <section className="relative rounded-[10px] overflow-hidden" style={{ background: 'var(--surface)', border: '1px solid var(--border)', boxShadow: CARD_SHADOW }}>
+          <div className="grid sm:grid-cols-[1.5fr_1fr]">
+            <div className="p-6 sm:p-7 order-last sm:order-none">
+              <div className="flex items-center gap-3">
+                <span className="h-px w-8 shrink-0" style={{ background: 'var(--text-secondary)' }} />
+                <span className="font-mono text-[10px] font-semibold tracking-[0.2em]" style={{ color: 'var(--text-secondary)' }}>TAXES SHOULDN&apos;T HOLD YOU BACK</span>
+              </div>
+              <h2 className="font-display font-extrabold text-[28px] sm:text-[34px] leading-[1.08] tracking-[-0.02em] mt-4" style={{ color: 'var(--text-primary)' }}>
+                Let your money <span className="marker-stripe">work harder for you.</span>
+              </h2>
+              <p className="text-sm mt-3 max-w-lg leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
+                Switching regimes can put real money back in your pocket. We run the numbers on your salary — you pick the cheaper one.
+              </p>
+              <button onClick={() => props.setMode('compare')} className="btn-marigold inline-flex items-center gap-2 mt-5 text-sm">
+                Find Your Best Regime <ArrowRight className="h-4 w-4" />
+              </button>
+              <div className="flex flex-wrap items-center gap-x-5 gap-y-2 mt-5">
+                {['Lower taxes', 'Bigger dreams', 'Brighter you'].map((c) => (
+                  <span key={c} className="inline-flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider" style={{ color: 'var(--text-secondary)' }}>
+                    <Check className="h-3.5 w-3.5" style={{ color: 'var(--success)' }} /> {c}
+                  </span>
+                ))}
               </div>
             </div>
-            <div className="text-right">
-              <span className="inline-block rounded-full px-3 py-1 text-[10px] font-bold" style={{ background: 'rgba(16,185,129,0.12)', color: '#10B981', border: '1px solid rgba(16,185,129,0.35)' }}>Protected today</span>
+            <div className="relative h-28 sm:h-auto sm:min-h-[240px] order-first sm:order-none sm:border-l" style={{ borderColor: 'var(--border)', background: 'linear-gradient(120deg, #FFF6DC 0%, #FBE0E3 55%, #D9E8A6 100%)' }}>
+              <img src="/img/hero-desk.svg" alt="Notebook, coffee and a small plant on a warm desk" className="absolute inset-0 h-full w-full object-cover" onError={(e) => { e.currentTarget.style.display = 'none' }} />
+              {/* washi tape corners */}
+              <span aria-hidden="true" className="absolute top-2.5 left-3 h-4.5 w-16 -rotate-6 hidden sm:block" style={{ height: '18px', width: '64px', background: 'rgba(255,201,60,0.45)', border: '1px solid rgba(20,32,58,0.06)' }} />
+              <span aria-hidden="true" className="absolute bottom-2.5 right-3 rotate-3 hidden sm:block" style={{ height: '18px', width: '56px', background: 'rgba(217,232,166,0.65)', border: '1px solid rgba(20,32,58,0.06)' }} />
             </div>
           </div>
-        </div>
-        <div className="mt-4 pt-4" style={{ borderTop: '1px solid var(--border)' }}>
-          <p className="text-xs" style={{ color: 'var(--text-2)' }}>
-            By choosing the new regime — <span className="font-mono font-semibold" style={{ color: 'var(--text-primary)' }}>₹{old.tax.toLocaleString('en-IN')}</span> vs <span className="font-mono font-semibold" style={{ color: 'var(--text-primary)' }}>₹{nu.tax.toLocaleString('en-IN')}</span> tax payable. Salary base <span className="font-mono font-semibold" style={{ color: 'var(--text-primary)' }}>₹{annual.toLocaleString('en-IN')}</span>/yr.
-          </p>
-        </div>
-      </Card>
+        </section>
 
-      {/* Regime tiles */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <div className="rounded-3xl p-5" style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '2rem 1rem 2rem 1rem' }}>
-          <div className="flex items-center justify-between mb-3">
-            <span className="text-sm font-semibold" style={{ color: 'var(--text-2)' }}>Old Regime</span>
-            <TrendingUp className="h-4 w-4" style={{ color: 'var(--text-2)' }} />
+        {/* (2) Savings — printed-statement ledger, flat */}
+        <section className="rounded-[10px] p-6" style={{ background: 'var(--surface)', border: '1px solid var(--border)', boxShadow: CARD_SHADOW }}>
+          <div className="flex flex-wrap items-start justify-between gap-6">
+            <div className="flex items-center gap-4 min-w-0">
+              <span className="h-12 w-12 rounded-full flex items-center justify-center shrink-0" style={{ background: 'var(--pink-soft)', border: '1px solid rgba(176,74,99,0.25)' }}>
+                <PiggyBank className="h-6 w-6" style={{ color: '#B04A63' }} />
+              </span>
+              <div className="min-w-0">
+                <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.18em]" style={{ color: 'var(--text-secondary)' }}>You save</p>
+                {loading
+                  ? <div className="h-10 w-40 rounded animate-pulse mt-1" style={{ background: 'var(--surface-muted)' }} />
+                  : <div className="mt-1"><HeroStat value={b.savings} /></div>}
+                <p className="text-[11px] mt-1.5" style={{ color: 'var(--text-secondary)' }}>Estimated yearly tax savings</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-5">
+              {b.savings > 0 && (
+                <div className="relative h-20 w-20 shrink-0">
+                  <svg viewBox="0 0 100 100" className="h-full w-full -rotate-90">
+                    <circle cx="50" cy="50" r="40" fill="none" stroke="var(--surface-muted)" strokeWidth="8" />
+                    <circle cx="50" cy="50" r="40" fill="none" stroke="#FFC93C" strokeWidth="8" strokeDasharray={`${Math.min(1, b.savingsPercent / 100) * 2 * Math.PI * 40} ${2 * Math.PI * 40}`} strokeLinecap="butt" />
+                  </svg>
+                  <div className="absolute inset-0 flex flex-col items-center justify-center">
+                    <span className="font-mono font-bold text-sm" style={{ color: 'var(--text-primary)' }}>{b.savingsPercent}%</span>
+                    <span className="text-[8px] font-semibold" style={{ color: 'var(--text-secondary)' }}>of your tax</span>
+                  </div>
+                </div>
+              )}
+              <span className="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[11px] font-bold" style={{ background: 'var(--success-soft)', color: 'var(--success)', border: '1px solid rgba(46,158,107,0.3)' }}>
+                <ShieldCheck className="h-3.5 w-3.5" /> Protected today
+              </span>
+            </div>
           </div>
-          <p className="font-mono text-2xl font-bold" style={{ color: 'var(--text-2)' }}>₹{old.tax.toLocaleString('en-IN')}</p>
-          <p className="text-[11px] mt-1" style={{ color: 'var(--text-2)' }}>incl. standard deduction ₹75,000</p>
-        </div>
-        <div className="rounded-3xl p-5 relative" style={{ background: 'linear-gradient(180deg, rgba(30,27,75,1) 0%, rgba(49,46,129,1) 100%)', border: '1px solid rgba(251,191,36,0.35)', borderRadius: '1rem 2rem 1rem 2rem' }}>
-          <span className="absolute -top-2 -right-2 px-3 py-1 rounded-full text-[10px] font-bold" style={{ background: 'rgba(251,191,36,0.15)', color: '#FBBF24', border: '1px solid rgba(251,191,36,0.45)' }}>RECOMMENDED</span>
-          <div className="flex items-center justify-between mb-3">
-            <span className="text-sm font-semibold" style={{ color: '#FDE68A' }}>New Regime</span>
-            <TrendingUp className="h-4 w-4" style={{ color: '#FBBF24' }} />
+          <div className="mt-5 pt-4" style={{ borderTop: '1px solid var(--border)' }}>
+            <p className="text-xs leading-relaxed" style={{ color: 'var(--text-secondary)' }}>{`By choosing the ${recommendedRegime} regime — ${formatINR(b.oldTax)} vs ${formatINR(b.newTax)} tax payable. Salary base ${formatINR(b.salaryBase)}/yr.`}</p>
           </div>
-          <p className="font-mono text-2xl font-bold" style={{ color: '#FBBF24' }}>₹{nu.tax.toLocaleString('en-IN')}</p>
-          <p className="text-[11px] mt-1" style={{ color: 'rgba(241,242,250,0.6)' }}>incl. standard deduction ₹75,000</p>
-          <span className="absolute -bottom-3 -right-3 rounded-full px-3 py-1 text-xs font-bold" style={{ background: 'linear-gradient(135deg, #FBBF24, #FDE68A)', color: '#0F172A', boxShadow: '0 8px 20px -8px rgba(245,158,11,0.55)' }}>
-            You save ₹{diff.toLocaleString('en-IN')} per year!
-          </span>
-        </div>
-      </div>
+        </section>
 
-      {/* Action tiles */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-        {ACTIONS.map((a) => {
-          const Icon = a.icon
-          return (
-            <button key={a.title} onClick={() => props.setMode(a.mode)} className="rounded-2xl p-4 text-left transition-transform active:scale-95" style={{ background: 'var(--surface)', border: '1px solid var(--border)', opacity: 0.9 }}>
-              <Icon className="h-5 w-5 mb-2" style={{ color: 'var(--kavach-gold)' }} />
-              <p className="text-sm font-bold" style={{ color: 'var(--text-primary)' }}>{a.title}</p>
-              <p className="text-[11px]" style={{ color: 'var(--text-2)' }}>{a.sub}</p>
-              <span className="text-[11px] mt-1 inline-block" style={{ color: 'var(--text-2)' }}>→</span>
+        {/* (3) Regimes — one ledger card, recommended row marked with a marigold rule */}
+        <section className="rounded-[10px] overflow-hidden" style={{ background: 'var(--surface)', border: '1px solid var(--border)', boxShadow: CARD_SHADOW }}>
+          <div className="flex items-baseline justify-between gap-3 px-5 py-3.5" style={{ borderBottom: '1px solid var(--border)' }}>
+            <h3 className="font-mono text-[10px] font-semibold uppercase tracking-[0.18em]" style={{ color: 'var(--text-secondary)' }}>Regime check</h3>
+            <span className="text-[11px]" style={{ color: 'var(--text-secondary)' }}>incl. standard deduction {formatINR(b.standardDeduction)}</span>
+          </div>
+          {([
+            { key: 'old', label: 'Old Regime', tax: b.oldTax },
+            { key: 'new', label: 'New Regime', tax: b.newTax },
+          ] as Array<{ key: 'old' | 'new'; label: string; tax: number }>).map((r, i) => {
+            const isRec = recommendedRegime === r.key && showRec
+            return (
+              <div
+                key={r.key}
+                className="flex items-center gap-4 px-5 py-4"
+                style={{
+                  background: isRec ? 'rgba(255,201,60,0.12)' : 'transparent',
+                  borderLeft: `4px solid ${isRec ? '#FFC93C' : 'transparent'}`,
+                  borderTop: i > 0 ? '1px solid var(--border)' : 'none',
+                }}
+              >
+                <div className="min-w-0">
+                  <p className="text-sm font-semibold" style={{ color: isRec ? 'var(--text-primary)' : 'var(--text-secondary)' }}>{r.label}</p>
+                  {isRec && <p className="font-mono text-[9px] font-bold tracking-[0.18em] mt-1" style={{ color: '#92400E' }}>RECOMMENDED</p>}
+                </div>
+                <p className="ml-auto font-mono text-2xl sm:text-[28px] font-bold tabular-nums" style={{ color: 'var(--text-primary)' }}>{formatINR(r.tax)}</p>
+              </div>
+            )
+          })}
+          <div className="px-5 py-3.5" style={{ background: equal ? 'var(--surface-muted)' : '#FFC93C', borderTop: '1px solid var(--border)' }}>
+            <p className="text-[13px] font-bold" style={{ color: equal ? 'var(--text-primary)' : '#14203A' }}>
+              {equal ? 'Both regimes cost the same for you' : `You save ${formatINR(b.savings)} per year!`}
+            </p>
+          </div>
+        </section>
+
+        {/* (4) Features — numbered contents list, not four identical tiles */}
+        <section className="rounded-[10px] overflow-hidden" style={{ background: 'var(--surface)', border: '1px solid var(--border)', boxShadow: CARD_SHADOW }}>
+          {FEATURES.map((f, i) => (
+            <button
+              key={f.title}
+              onClick={() => (f.ai ? props.onAskAI() : f.mode && props.setMode(f.mode))}
+              className="w-full flex items-center gap-4 px-5 py-4 text-left transition-colors hover:bg-[var(--surface-muted)]"
+              style={{ borderTop: i > 0 ? '1px solid var(--border)' : 'none' }}
+            >
+              <span className="font-mono text-[11px] font-semibold w-6 shrink-0" style={{ color: 'var(--text-secondary)' }}>{String(i + 1).padStart(2, '0')}</span>
+              <span className="flex-1 min-w-0">
+                <span className="block text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>{f.title}</span>
+                <span className="block text-xs mt-0.5" style={{ color: 'var(--text-secondary)' }}>{f.desc}</span>
+              </span>
+              <ArrowRight className="h-4 w-4 shrink-0 transition-transform group-hover:translate-x-0.5" style={{ color: 'var(--text-secondary)' }} />
             </button>
-          )
-        })}
+          ))}
+        </section>
       </div>
 
-      {/* Smart insights */}
-      <Card>
-        <div className="flex items-center justify-between mb-3">
-          <h3 className="font-display font-bold text-lg" style={{ color: 'var(--text-primary)' }}>Smart Insights for You</h3>
-          <button className="text-xs font-semibold" style={{ color: 'var(--indigo, #4338CA)' }}>See all →</button>
+      {/* (Right rail) */}
+      <aside className="space-y-5 lg:sticky lg:top-24">
+        {/* Sticky note with tape */}
+        <div className="relative rounded-[4px] p-5 pt-6" style={{ background: 'var(--note-green)', border: '1px solid rgba(120,140,60,0.35)', boxShadow: '0 6px 14px -10px rgba(80,100,40,0.6)', transform: 'rotate(1.6deg)' }}>
+          <span aria-hidden="true" className="absolute -top-2.5 left-1/2 -translate-x-1/2 -rotate-2" style={{ height: '18px', width: '72px', background: 'rgba(255,253,248,0.8)', border: '1px solid rgba(20,32,58,0.08)' }} />
+          <p className="font-hand text-[22px] leading-snug" style={{ color: '#3F4A21' }}>{quoteOfTheDay()}</p>
         </div>
-        <div className="space-y-2">
-          <div className="flex items-center gap-3 rounded-xl p-3" style={{ background: 'var(--surface-muted)' }}>
-            <span className="h-9 w-9 rounded-lg flex items-center justify-center shrink-0" style={{ background: 'var(--surface)' }}>🏠</span>
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>HRA optimization</p>
-              <p className="text-[11px]" style={{ color: 'var(--text-2)' }}>up to ₹10,000 more</p>
-            </div>
-          </div>
-          <div className="flex items-center gap-3 rounded-xl p-3" style={{ background: 'var(--surface-muted)' }}>
-            <span className="h-9 w-9 rounded-lg flex items-center justify-center shrink-0" style={{ background: 'var(--surface)' }}>🛡️</span>
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>NPS contributions</p>
-              <p className="text-[11px]" style={{ color: 'var(--text-2)' }}>to reduce taxable income</p>
-            </div>
-          </div>
-        </div>
-      </Card>
 
-      {/* Closing CTA */}
-      <div className="rounded-3xl p-6" style={{ background: 'linear-gradient(135deg, #4338CA, #6366F1)', border: '1px solid rgba(165,180,252,0.2)' }}>
-        <h3 className="font-display font-extrabold text-xl" style={{ color: '#fff' }}>Ready to switch?</h3>
-        <p className="text-sm mt-1" style={{ color: 'rgba(255,255,255,0.8)' }}>Move to the regime that saves you more — in one tap.</p>
-        <button onClick={() => props.setMode('compare')} className="mt-3 rounded-full px-5 py-2.5 text-sm font-bold" style={{ background: '#fff', color: '#4338CA' }}>
-          Switch to New Regime →
-        </button>
-      </div>
+        {/* Quick actions — plain hairline list */}
+        <div className="rounded-[10px] px-5 py-4" style={{ background: 'var(--surface)', border: '1px solid var(--border)', boxShadow: CARD_SHADOW }}>
+          <h3 className="font-mono text-[10px] font-semibold uppercase tracking-[0.18em] pb-1" style={{ color: 'var(--text-secondary)' }}>Quick actions</h3>
+          <div className="mt-1">
+            {[
+              { label: 'Compare Tax Regimes', run: () => props.setMode('compare') },
+              { label: 'Explore Deductions', run: () => props.setMode('taxes') },
+              { label: 'Ask AI a Question', run: () => props.onAskAI() },
+              { label: 'Read Guides', run: () => props.setMode('learn') },
+            ].map((a, i) => (
+              <button key={a.label} onClick={a.run} className="w-full flex items-center justify-between gap-2 py-3 text-left transition-colors hover:text-[var(--text-primary)]" style={{ borderTop: i > 0 ? '1px solid var(--border)' : 'none' }}>
+                <span className="text-[13px] font-medium" style={{ color: 'var(--text-secondary)' }}>{a.label}</span>
+                <ChevronRight className="h-3.5 w-3.5 shrink-0" style={{ color: 'var(--text-secondary)' }} />
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Tip of the week */}
+        <div className="rounded-[10px] px-5 py-4" style={{ background: 'var(--surface)', border: '1px solid var(--border)', boxShadow: CARD_SHADOW }}>
+          <div className="flex items-center gap-2">
+            <Lightbulb className="h-3.5 w-3.5" style={{ color: '#B45309' }} />
+            <h3 className="font-mono text-[10px] font-semibold uppercase tracking-[0.18em]" style={{ color: 'var(--text-secondary)' }}>This week&apos;s tip</h3>
+          </div>
+          <p className="text-sm mt-2 leading-relaxed" style={{ color: 'var(--text-primary)' }}>{b.tipOfTheWeek}</p>
+          <p className="font-hand text-xl mt-1.5" style={{ color: 'var(--text-secondary)' }}>You got this!</p>
+        </div>
+      </aside>
     </div>
   )
 }

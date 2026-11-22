@@ -1,8 +1,8 @@
 import * as React from 'react'
-import { Shield, User, Plus, Minus, ChartBar, Settings, Bell, Languages } from 'lucide-react'
+import { Shield, User, Plus, Minus, ChartBar, Settings, Bell, Languages, Star } from 'lucide-react'
 
 export function Card({ children, className = '' }: { children: React.ReactNode; className?: string }) {
-  return <div className={`rounded-xl border shadow-sm p-4 ${className}`} style={{ background: 'var(--surface)', borderColor: 'var(--surface-muted)' }}>{children}</div>
+  return <div className={`rounded-[10px] border p-4 ${className}`} style={{ background: 'var(--surface)', borderColor: 'var(--border)', boxShadow: '0 1px 2px rgba(20,32,58,0.04)' }}>{children}</div>
 }
 export function CardHeader({ children }: { children: React.ReactNode }) {
   return <div className="flex justify-between items-center mb-4">{children}</div>
@@ -32,7 +32,9 @@ export function Ratings({ rating, max = 5, onRate, size = 24 }: { rating: number
   return (
     <div className="flex gap-1 items-center">
       {Array.from({ length: max }).map((_, i) => (
-        <span key={i} onClick={() => onRate?.(i + 1)} className="cursor-pointer text-amber-500" aria-label="star" title="star">⭐</span>
+        <span key={i} onClick={() => onRate?.(i + 1)} className="cursor-pointer" aria-label="star" title="star">
+          <Star className="inline-block" width={size} height={size} strokeWidth={2} fill={i < rating ? '#F59E0B' : 'none'} color={i < rating ? '#F59E0B' : '#CBD5E1'} />
+        </span>
       ))}
       <span className="ml-1 text-sm text-slate-600">{rating}</span>
     </div>

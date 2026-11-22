@@ -17,10 +17,10 @@ export function BottomNav(props: { mode: ModeKey; setMode: (m: ModeKey) => void;
           const active = props.mode === t.key
           const Icon = t.Icon
           return (
-            <button key={t.key} type="button" onClick={() => props.setMode(t.key)} className="relative flex flex-col items-center justify-center gap-0.5" style={{ color: active ? 'var(--indigo, #4338CA)' : 'var(--text-2)' }} aria-label={t.label}>
-              {active && <span className="absolute top-0 h-0.5 w-8 rounded-full" style={{ background: 'linear-gradient(135deg, #4338CA, #A5B4FC)' }} />}
-              <span className="h-8 w-14 rounded-full flex items-center justify-center" style={active ? { background: 'linear-gradient(135deg, rgba(67,56,202,0.2), rgba(165,180,252,0.15))' } : undefined}>
-                <Icon className="h-5 w-5" />
+            <button key={t.key} type="button" onClick={() => props.setMode(t.key)} className="relative flex flex-col items-center justify-center gap-0.5" style={{ color: active ? 'var(--text-primary)' : 'var(--text-secondary)' }} aria-label={t.label} aria-current={active ? 'page' : undefined}>
+              {active && <span className="absolute top-0 h-0.5 w-8 rounded-full" style={{ background: '#FFC93C' }} />}
+              <span className="h-8 w-14 rounded-full flex items-center justify-center" style={active ? { background: 'var(--surface-muted)' } : undefined}>
+                <Icon className="h-5 w-5" strokeWidth={active ? 2.4 : 1.8} />
               </span>
               <span className="text-[10px] font-semibold">{t.label}</span>
             </button>

@@ -1,16 +1,16 @@
 // AuditSmsConsoleUI — Shield Mode screen (Design Spec §3): hero, quick actions, composer, verdict, recent scans.
 import { useEffect, useState, useRef } from 'react'
 import { motion } from 'framer-motion'
-import { ShieldCheck, ShieldX, ShieldAlert, ScanSearch, KeyRound, Link2, Clock, Lock, ClipboardPaste, ChevronDown } from 'lucide-react'
+import { ShieldCheck, ShieldX, ShieldAlert, ScanSearch, KeyRound, Link2, Clock, Lock, ClipboardPaste, ChevronDown, Zap, PhoneCall } from 'lucide-react'
 import { Card, CardHeader, Icons } from '@/modules/ui/widgets/Table'
 import { showToast, StatusBar } from '@/modules/ui/widgets/ToolMessaging'
 import { AuditSmsConsole, type HistoryItem } from '@/modules/shield/AuditSmsConsole'
 import { Confetti } from '@/modules/ui/widgets/Confetti'
 
 const STATE_META: Record<string, { color: string; icon: typeof ShieldCheck; chip: string }> = {
-  SAFE: { color: '#10B981', icon: ShieldCheck, chip: 'bg-emerald-50 text-emerald-700 border border-emerald-200' },
-  SCAM: { color: '#EF4444', icon: ShieldX, chip: 'bg-rose-50 text-rose-700 border border-rose-200' },
-  NOT_SURE: { color: '#F59E0B', icon: ShieldAlert, chip: 'bg-amber-50 text-amber-700 border border-amber-200' },
+  SAFE: { color: '#2E9E6B', icon: ShieldCheck, chip: 'border px-3 py-1 rounded-full text-xs font-semibold' },
+  SCAM: { color: '#EF4444', icon: ShieldX, chip: 'border px-3 py-1 rounded-full text-xs font-semibold' },
+  NOT_SURE: { color: '#D97706', icon: ShieldAlert, chip: 'border px-3 py-1 rounded-full text-xs font-semibold' },
 }
 
 function reasonIcon(reason: string): typeof ShieldAlert {
@@ -21,13 +21,13 @@ function reasonIcon(reason: string): typeof ShieldAlert {
   return ShieldX
 }
 
-function evidenceFor(rule: string): { icon: string; label: string } {
+function evidenceFor(rule: string): { icon: typeof ShieldAlert; label: string } {
   const r = rule.toLowerCase()
-  if (r.includes('otp')) return { icon: '❗', label: 'Asked for OTP' }
-  if (r.includes('url') || r.includes('fake') || r.includes('phishing') || r.includes('domain') || r.includes('collect')) return { icon: '🔗', label: 'Suspicious link' }
-  if (r.includes('brand')) return { icon: '⚡', label: 'Impersonation' }
-  if (r.includes('call')) return { icon: '📞', label: 'Fraud call' }
-  return { icon: '⏰', label: 'Unknown sender' }
+  if (r.includes('otp')) return { icon: ShieldAlert, label: 'Asked for OTP' }
+  if (r.includes('url') || r.includes('fake') || r.includes('phishing') || r.includes('domain') || r.includes('collect')) return { icon: Link2, label: 'Suspicious link' }
+  if (r.includes('brand')) return { icon: Zap, label: 'Impersonation' }
+  if (r.includes('call')) return { icon: PhoneCall, label: 'Fraud call' }
+  return { icon: Clock, label: 'Unknown sender' }
 }
 
 export function AuditSmsConsoleUI(props: { onAskAI: (preset?: string) => void }) {
@@ -89,24 +89,22 @@ export function AuditSmsConsoleUI(props: { onAskAI: (preset?: string) => void })
 
   return (
     <div className="space-y-4 stagger">
-      {/* Hero — centered shield emblem + hex mesh + pulse */}
+      {/* Hero — flat status block */}
       <motion.div
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
-        className="relative rounded-3xl p-6 overflow-hidden text-center"
+        className="rounded-[10px] p-6 text-center"
         style={{
-          background: 'linear-gradient(180deg, rgba(30,27,75,0.95) 0%, rgba(49,46,129,0.95) 100%)',
-          border: '1px solid rgba(165,180,252,0.25)',
-          boxShadow: '0 24px 48px -24px rgba(30,27,75,0.65)',
+          background: 'var(--surface)',
+          border: '1px solid var(--border)',
+          boxShadow: '0 1px 2px rgba(20,32,58,0.05)',
         }}
       >
-        <div className="absolute inset-0 pointer-events-none opacity-40" style={{ backgroundImage: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='56'%3E%3Cpath d='M28 4 L48 16 L48 40 L28 52 L8 40 L8 16 Z' fill='none' stroke='%23A5B4FC' stroke-width='0.6' opacity='0.35'/%3E%3C/svg%3E\")", backgroundSize: '56px 56px', backgroundRepeat: 'repeat' }} />
-        <div className="relative z-10 flex flex-col items-center">
-          <span className="relative h-20 w-20 rounded-full flex items-center justify-center mb-3" style={{ background: 'rgba(99,102,241,0.16)' }}>
-            <ShieldCheck className="h-10 w-10 relative z-10" style={{ color: '#A5B4FC' }} />
-            <span className="absolute inset-0 rounded-full animate-breathe" style={{ background: 'rgba(99,102,241,0.35)' }} />
+        <div className="flex flex-col items-center">
+          <span className="h-16 w-16 rounded-full flex items-center justify-center mb-3" style={{ background: 'var(--success-soft)', border: '1px solid rgba(46,158,107,0.3)' }}>
+            <ShieldCheck className="h-8 w-8" style={{ color: 'var(--success)' }} />
           </span>
-          <h2 className="font-display font-extrabold text-2xl" style={{ color: 'var(--text-primary)' }}>You're protected</h2>
+          <h2 className="font-display font-extrabold text-2xl" style={{ color: 'var(--text-primary)' }}>You&apos;re protected</h2>
           <p className="text-sm font-medium mt-1" style={{ color: 'var(--text-secondary)' }}>
             {scanned} message{scanned === 1 ? '' : 's'} scanned this week · {threats} threat{threats === 1 ? '' : 's'}
           </p>
@@ -125,8 +123,8 @@ export function AuditSmsConsoleUI(props: { onAskAI: (preset?: string) => void })
         ].map((q) => {
           const Icon = q.icon
           return (
-            <button key={q.label} onClick={q.onClick} className="flex-1 flex items-center justify-center gap-1.5 rounded-xl py-2.5 text-xs font-semibold" style={{ background: 'var(--surface)', border: '1px solid var(--surface-muted)', color: 'var(--text-primary)' }}>
-              <Icon className="h-4 w-4" style={{ color: 'var(--kavach-gold)' }} />
+            <button key={q.label} onClick={q.onClick} className="flex-1 flex items-center justify-center gap-1.5 rounded-[6px] py-2.5 text-xs font-semibold transition-colors hover:bg-[var(--surface-muted)]" style={{ background: 'var(--surface)', border: '1px solid var(--border)', color: 'var(--text-primary)' }}>
+              <Icon className="h-4 w-4" style={{ color: 'var(--text-secondary)' }} />
               {q.label}
             </button>
           )
@@ -134,14 +132,14 @@ export function AuditSmsConsoleUI(props: { onAskAI: (preset?: string) => void })
       </div>
 
       {/* Composer: Scan a message */}
-      <div className="rounded-2xl p-4" style={{ background: 'var(--surface)', border: '1px solid var(--surface-muted)', boxShadow: '0 4px 14px -6px rgb(15 23 42 / 0.10)' }}>
+      <div className="rounded-[10px] p-4" style={{ background: 'var(--surface)', border: '1px solid var(--border)', boxShadow: '0 1px 2px rgba(20,32,58,0.04)' }}>
         <div className="flex items-center justify-between mb-3">
           <h2 className="font-display font-bold text-lg" style={{ color: 'var(--text-primary)' }}>Scan a message</h2>
           <span title="Connect an SMS gateway to scan your inbox automatically" className="h-7 w-7 rounded-full flex items-center justify-center" style={{ background: 'var(--surface-muted)', color: 'var(--text-secondary)' }}>
             <span className="text-xs font-bold">i</span>
           </span>
         </div>
-        <div className="relative rounded-2xl overflow-hidden" style={{ background: 'var(--surface-muted)', border: '1px solid var(--surface-muted)', boxShadow: 'inset 0 2px 10px rgb(15 23 42 / 0.05)' }}>
+        <div className="relative rounded-[6px] overflow-hidden" style={{ background: 'var(--surface-muted)', border: '1px solid var(--border)' }}>
           <textarea
             ref={textareaRef}
             value={input}
@@ -150,17 +148,17 @@ export function AuditSmsConsoleUI(props: { onAskAI: (preset?: string) => void })
             className="w-full px-4 py-3 text-sm outline-none resize-none bg-transparent text-[var(--text-primary)] placeholder:text-[var(--text-secondary)]"
             placeholder="Paste suspicious SMS..."
             style={{ boxShadow: '0 0 0 0 transparent' }}
-            onFocus={(e) => { e.currentTarget.parentElement!.style.boxShadow = 'inset 0 2px 10px rgb(15 23 42 / 0.05), 0 0 0 2px var(--kavach-gold)' }}
-            onBlur={(e) => { e.currentTarget.parentElement!.style.boxShadow = 'inset 0 2px 10px rgb(15 23 42 / 0.05)' }}
+          onFocus={(e) => { e.currentTarget.parentElement!.style.boxShadow = '0 0 0 2px var(--kavach-gold)' }}
+            onBlur={(e) => { e.currentTarget.parentElement!.style.boxShadow = 'none' }}
           />
           <button onClick={pasteFromClipboard} className="absolute bottom-2 right-2 rounded-lg px-2 py-1 text-[10px] font-semibold" style={{ background: 'var(--surface)', border: '1px solid var(--surface-muted)', color: 'var(--text-secondary)' }}>
             <ClipboardPaste className="inline h-3 w-3 mr-1" />
             Paste from clipboard
           </button>
           {scanning && (
-            <div className="absolute inset-0 overflow-hidden rounded-2xl">
+            <div className="absolute inset-0 overflow-hidden rounded-[10px]">
               <div className="absolute inset-0 animate-pulse" style={{ background: 'rgba(13,148,136,0.08)' }} />
-              <div className="absolute left-0 right-0 h-[2px] animate-scan" style={{ background: 'linear-gradient(90deg, transparent, #818CF8, transparent)', boxShadow: '0 0 12px #818CF8' }} />
+              <div className="absolute left-0 right-0 h-[2px] animate-scan" style={{ background: '#14203A' }} />
             </div>
           )}
         </div>
@@ -168,7 +166,7 @@ export function AuditSmsConsoleUI(props: { onAskAI: (preset?: string) => void })
           onClick={runDetector}
           disabled={scanning || !input.trim()}
           className="w-full mt-3 flex items-center justify-center gap-2 rounded-xl py-2.5 text-sm font-bold disabled:opacity-40"
-          style={{ background: '#F59E3B', color: '#0F172A', boxShadow: input.trim() ? '0 8px 20px -8px rgba(245,158,11,0.55)' : 'none' }}
+          style={{ background: '#FFC93C', color: '#14203A', boxShadow: input.trim() ? '0 8px 20px -8px rgba(255,201,60,0.55)' : 'none' }}
         >
           <ScanSearch className="h-4 w-4" />
           Scan
@@ -178,15 +176,15 @@ export function AuditSmsConsoleUI(props: { onAskAI: (preset?: string) => void })
       {/* Scanning state: skeleton + status lines */}
       {scanning && (
         <div className="space-y-3">
-          <div className="rounded-2xl p-4 animate-pulse" style={{ background: 'var(--surface)', border: '1px solid var(--surface-muted)' }}>
+          <div className="rounded-[10px] p-4 animate-pulse" style={{ background: 'var(--surface)', border: '1px solid var(--surface-muted)' }}>
             <div className="h-3 w-2/3 rounded" style={{ background: 'var(--surface-muted)' }} />
             <div className="h-3 w-1/2 rounded mt-2" style={{ background: 'var(--surface-muted)' }} />
             <div className="h-3 w-3/4 rounded mt-2" style={{ background: 'var(--surface-muted)' }} />
           </div>
-          <div className="rounded-2xl p-4" style={{ background: 'var(--surface)', border: '1px solid var(--surface-muted)' }}>
+          <div className="rounded-[10px] p-4" style={{ background: 'var(--surface)', border: '1px solid var(--surface-muted)' }}>
             {['Checking sender…', 'Analyzing links…', 'Reading language patterns…'].map((s) => (
-              <p key={s} className="text-xs py-0.5 flex items-center gap-2" style={{ color: scanStatus === s ? '#A5B4FC' : 'var(--text-secondary)' }}>
-                <span className="h-1.5 w-1.5 rounded-full" style={{ background: scanStatus === s ? '#A5B4FC' : 'var(--surface-muted)' }} />
+              <p key={s} className="text-xs py-0.5 flex items-center gap-2" style={{ color: scanStatus === s ? 'var(--text-primary)' : 'var(--text-secondary)' }}>
+                <span className="h-1.5 w-1.5 rounded-full" style={{ background: scanStatus === s ? '#FFC93C' : 'var(--surface-muted)' }} />
                 {s}
               </p>
             ))}
@@ -227,7 +225,7 @@ export function AuditSmsConsoleUI(props: { onAskAI: (preset?: string) => void })
         </div>
       </div>
 
-      <StatusBar title="🛡️ Shield Mode — SMS Bodyguard" detail="Paste any SMS/alert text below." />
+      <StatusBar title="Shield Mode — SMS Bodyguard" detail="Paste any SMS/alert text below." />
       <p className="text-xs text-center" style={{ color: 'var(--text-secondary)' }}>Every verdict is deterministic & explainable — verify links with official apps.</p>
     </div>
   )
@@ -235,16 +233,16 @@ export function AuditSmsConsoleUI(props: { onAskAI: (preset?: string) => void })
 
 function SafeCard({ item }: { item: HistoryItem }) {
   return (
-    <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="rounded-2xl p-4 flex items-start gap-3"
+    <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="rounded-[10px] p-4 flex items-start gap-3"
       style={{ background: 'rgba(5,150,105,0.08)', border: '1px solid rgba(5,150,105,0.35)' }}>
-      <span className="h-9 w-9 rounded-full flex items-center justify-center shrink-0" style={{ background: 'rgba(5,150,105,0.12)', color: '#059669' }}>
+      <span className="h-9 w-9 rounded-full flex items-center justify-center shrink-0" style={{ background: 'rgba(46,158,107,0.12)', color: '#2E9E6B' }}>
         <ShieldCheck className="h-5 w-5" />
       </span>
       <div className="min-w-0">
-        <p className="font-display font-bold text-sm" style={{ color: '#059669' }}>Safe</p>
+        <p className="font-display font-bold text-sm" style={{ color: '#2E9E6B' }}>Safe</p>
         <p className="text-xs font-semibold" style={{ color: 'var(--text-primary)' }}>{item.sms.length > 90 ? `${item.sms.slice(0, 90)}…` : item.sms}</p>
         <p className="text-[11px]" style={{ color: 'var(--text-secondary)' }}>from: {item.sender}</p>
-        <p className="text-[11px] font-medium mt-1" style={{ color: '#059669' }}>All good — read normally. You are protected.</p>
+        <p className="text-[11px] font-medium mt-1" style={{ color: '#2E9E6B' }}>All good — read normally. You are protected.</p>
       </div>
     </motion.div>
   )
@@ -253,12 +251,12 @@ function SafeCard({ item }: { item: HistoryItem }) {
 function RiskGauge({ verdict }: { verdict: string }) {
   const scam = verdict === 'SCAM'
   const notSure = verdict === 'NOT_SURE'
-  const color = scam ? '#EF4444' : notSure ? '#F59E0B' : '#10B981'
+  const color = scam ? '#EF4444' : notSure ? '#D97706' : '#2E9E6B'
   const frac = scam ? 1 : notSure ? 0.6 : 0.15
   const len = Math.PI * 45
   const dash = frac * len
   return (
-    <div className="rounded-2xl p-4 flex flex-col items-center" style={{ background: 'var(--surface)', border: '1px solid var(--surface-muted)' }}>
+    <div className="rounded-[10px] p-4 flex flex-col items-center" style={{ background: 'var(--surface)', border: '1px solid var(--surface-muted)' }}>
       <svg viewBox="0 0 120 70" className="w-full max-w-[220px]" aria-hidden>
         <path d="M 15 60 A 45 45 0 0 1 105 60" fill="none" stroke="var(--surface-muted)" strokeWidth="10" strokeLinecap="round" />
         <path d="M 15 60 A 45 45 0 0 1 105 60" fill="none" stroke={color} strokeWidth="10" strokeLinecap="round" strokeDasharray={`${dash} ${len}`} />
@@ -276,7 +274,7 @@ function TimelineRow({ item, expanded, onToggle }: { item: HistoryItem; expanded
   const time = item.at ? new Date(item.at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ''
   const summary = item.verdict.label === 'SAFE' ? 'All good — read normally' : item.verdict.reasons[0]?.slice(0, 60) ?? ''
   return (
-    <div className="rounded-2xl" style={{ background: 'var(--surface)', border: '1px solid var(--surface-muted)' }}>
+    <div className="rounded-[10px]" style={{ background: 'var(--surface)', border: '1px solid var(--surface-muted)' }}>
       <button onClick={onToggle} className="w-full flex items-center gap-3 p-3 text-left">
         <span className="h-2.5 w-2.5 rounded-full shrink-0" style={{ background: meta.color }} />
         <div className="flex-1 min-w-0">
@@ -293,10 +291,11 @@ function TimelineRow({ item, expanded, onToggle }: { item: HistoryItem; expanded
             {item.verdict.reasons.slice(0, 3).map((r, i) => {
               const EI = reasonIcon(r)
               const fe = evidenceFor(r)
+              const FI = fe.icon
               return (
                 <div key={i} className="flex gap-2 text-xs">
                   <EI className="h-3.5 w-3.5 mt-0.5 shrink-0" style={{ color: meta.color }} />
-                  <span>{fe.icon} {fe.label}</span>
+                  <span className="inline-flex items-center gap-1.5"><FI className="h-3.5 w-3.5 shrink-0" style={{ color: meta.color }} /> {fe.label}</span>
                 </div>
               )
             })}
@@ -320,7 +319,7 @@ function VerdictCard({ item, onMarkSafe, onReport, onAskAI }: { item: HistoryIte
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
-      className="relative rounded-2xl p-4"
+      className="relative rounded-[10px] p-4"
       style={{
         background: 'var(--surface)',
         border: `1px solid ${safe ? 'rgba(16,185,129,0.25)' : 'var(--surface-muted)'}`,
@@ -329,15 +328,15 @@ function VerdictCard({ item, onMarkSafe, onReport, onAskAI }: { item: HistoryIte
       }}
     >
       {safe && <Confetti />}
-      {scam && <div className="absolute inset-0 rounded-2xl animate-red-pulse pointer-events-none" style={{ boxShadow: 'inset 0 0 40px rgba(239,68,68,0.08)' }} />}
+      {scam && <div className="absolute inset-0 rounded-[10px] animate-red-pulse pointer-events-none" style={{ boxShadow: 'inset 0 0 40px rgba(239,68,68,0.08)' }} />}
       <div className="relative">
         <div className="flex items-start justify-between gap-2">
           <div className="flex items-center gap-2">
-            <span className="h-9 w-9 rounded-full flex items-center justify-center shrink-0" style={{ background: safe ? 'rgba(5,150,105,0.12)' : 'rgba(239,68,68,0.12)', color: safe ? '#059669' : '#DC2626' }}>
+            <span className="h-9 w-9 rounded-full flex items-center justify-center shrink-0" style={{ background: safe ? 'rgba(46,158,107,0.12)' : 'rgba(239,68,68,0.12)', color: safe ? '#2E9E6B' : '#DC2626' }}>
               <Icon className="h-5 w-5" />
             </span>
             <div>
-              <div className="font-display font-bold" style={{ color: safe ? '#059669' : '#DC2626' }}>{item.verdict.label === 'SCAM' ? 'SCAM DETECTED' : item.verdict.label}</div>
+              <div className="font-display font-bold" style={{ color: safe ? '#2E9E6B' : '#DC2626' }}>{item.verdict.label === 'SCAM' ? 'SCAM DETECTED' : item.verdict.label}</div>
               <div className="text-[10px] flex items-center gap-1.5" style={{ color: 'var(--text-secondary)' }}>
                 <Clock className="h-3 w-3 shrink-0" />
                 {time}
@@ -353,9 +352,10 @@ function VerdictCard({ item, onMarkSafe, onReport, onAskAI }: { item: HistoryIte
           <div className="mt-1 flex flex-wrap gap-1.5">
             {item.verdict.evidence.slice(0, 3).map((e, i) => {
               const fe = evidenceFor(e.rule)
+              const FI = fe.icon
               return (
-                <span key={i} className="inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-medium" style={{ background: scam ? 'rgba(239,68,68,0.10)' : 'rgba(16,185,129,0.10)', border: `1px solid ${scam ? 'rgba(239,68,68,0.35)' : 'rgba(16,185,129,0.35)'}`, color: scam ? '#DC2626' : '#059669' }}>
-                  {fe.icon} {fe.label}
+                <span key={i} className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium" style={{ background: scam ? 'rgba(239,68,68,0.10)' : 'rgba(46,158,107,0.10)', border: `1px solid ${scam ? 'rgba(239,68,68,0.35)' : 'rgba(46,158,107,0.35)'}`, color: scam ? '#DC2626' : '#2E9E6B' }}>
+                  <FI className="h-3.5 w-3.5 shrink-0" /> {fe.label}
                 </span>
               )
             })}
@@ -366,7 +366,7 @@ function VerdictCard({ item, onMarkSafe, onReport, onAskAI }: { item: HistoryIte
           <button onClick={onReport} className="text-xs font-bold rounded-lg px-3 py-1.5" style={{ background: 'linear-gradient(135deg, #EF4444, #DC2626)', color: '#fff' }}>Report to 1930</button>
         </div>
         {scam && <p className="mt-2 text-[11px] font-medium" style={{ color: '#DC2626' }}>Do NOT click links. Call 1930, do not reveal OTP.</p>}
-        {safe && <p className="mt-2 text-[11px] font-medium" style={{ color: '#059669' }}>All good — read normally. You are protected.</p>}
+        {safe && <p className="mt-2 text-[11px] font-medium" style={{ color: '#2E9E6B' }}>All good — read normally. You are protected.</p>}
       </div>
     </motion.div>
   )

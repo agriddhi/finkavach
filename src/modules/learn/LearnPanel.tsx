@@ -26,14 +26,14 @@ export function LearnPanel() {
       {/* Featured lesson */}
       <Card>
         <div className="flex flex-col sm:flex-row gap-4">
-          <div className="h-32 sm:h-24 sm:w-40 rounded-2xl flex items-center justify-center shrink-0" style={{ background: 'linear-gradient(135deg, #4338CA, #6366F1)' }}>
-            <span className="text-3xl">📘</span>
+          <div className="h-32 sm:h-24 sm:w-40 rounded-[10px] overflow-hidden shrink-0" style={{ background: 'linear-gradient(135deg, #14203A, #1E2A4A)' }}>
+            <img src="/img/lesson-cover.svg" alt="" aria-hidden="true" className="h-full w-full object-cover" onError={(e) => { e.currentTarget.style.display = 'none' }} />
           </div>
           <div className="flex-1">
-            <span className="inline-block rounded-full px-2.5 py-0.5 text-[10px] font-bold" style={{ background: 'rgba(251,191,36,0.15)', color: '#FBBF24' }}>FEATURED</span>
+            <span className="inline-block rounded-full px-2.5 py-0.5 text-[10px] font-bold" style={{ background: 'var(--kavach-gold)', color: '#14203A' }}>FEATURED</span>
             <h3 className="font-display font-bold text-lg mt-1" style={{ color: 'var(--text-primary)' }}>Old vs New regime, explained</h3>
             <p className="text-xs mt-1" style={{ color: 'var(--text-2)' }}>Which one saves you more? A 5-minute read.</p>
-            <button className="mt-2 text-xs font-bold" style={{ color: 'var(--indigo, #4338CA)' }}>Start lesson →</button>
+            <button className="mt-2 text-xs font-bold underline underline-offset-2" style={{ color: 'var(--text-primary)' }}>Start lesson →</button>
           </div>
         </div>
       </Card>
@@ -43,7 +43,7 @@ export function LearnPanel() {
         <h3 className="font-display font-bold text-lg mb-3" style={{ color: 'var(--text-primary)' }}>Topics</h3>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           {TOPICS.map((t) => (
-            <div key={t.title} className="rounded-2xl p-4" style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}>
+            <div key={t.title} className="rounded-[10px] p-4" style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}>
               <div className="flex items-center justify-between mb-2">
                 <p className="text-sm font-bold" style={{ color: 'var(--text-primary)' }}>{t.title}</p>
                 {t.progress === 100 && <CheckCircle2 className="h-4 w-4" style={{ color: '#10B981' }} />}

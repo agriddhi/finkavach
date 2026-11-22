@@ -2,3 +2,6 @@
 vite_stderr.log
 dist/
 node_modules/
+.vercel
+.env
+.env.local

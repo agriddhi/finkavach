@@ -1,18 +1,30 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { animate } from 'framer-motion'
+import { formatINR } from '@/modules/finance/format'
 
-export function HeroStat(props: { value: number; prefix?: string; suffix?: string }) {
+export function HeroStat(props: { value: number; suffix?: string }) {
   const [display, setDisplay] = useState(0)
+  const lastRef = useRef(0)
   useEffect(() => {
-    const c = animate(0, props.value, { duration: 0.9, ease: 'easeOut', onUpdate: (v: number) => setDisplay(v) })
+    const from = lastRef.current
+    lastRef.current = props.value
+    const c = animate(from, props.value, { duration: 0.9, ease: 'easeOut', onUpdate: (v: number) => setDisplay(v) })
     return () => c.stop()
   }, [props.value])
   const rounded = Math.round(display)
   return (
-    <div key={props.value} className="text-display font-extrabold text-4xl leading-none font-mono tracking-tight animate-gold-pulse" style={{ color: 'var(--kavach-gold)' }}>
-      {props.prefix}
-      {rounded.toLocaleString('en-IN')}
-      {props.suffix}
+    <div
+      key={props.value}
+      className="inline-block font-mono font-bold text-[2.6rem] sm:text-5xl leading-none tracking-tight"
+      style={{
+        color: 'var(--text-primary)',
+        // highlighter swipe under the figure — flat, not a glow
+        backgroundImage: 'linear-gradient(transparent 62%, rgba(255,201,60,0.5) 62%, rgba(255,201,60,0.5) 94%, transparent 94%)',
+        paddingBottom: '0.08em',
+      }}
+    >
+      {formatINR(rounded)}
+      {props.suffix ?? ''}
     </div>
   )
 }

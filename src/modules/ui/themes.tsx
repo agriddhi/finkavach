@@ -1,5 +1,5 @@
 // themes.ts — Curated personalisation themes (Design Spec §6)
-// 8 curated themes applied via CSS custom properties + data-theme attribute.
+// Paper (warm cream planner) is the default; Navy Night is the optional dark variant. Auto follows the OS.
 export interface Theme {
   id: string
   name: string
@@ -14,6 +14,8 @@ export interface Theme {
 }
 
 export const THEMES: Theme[] = [
+  { id: 'paper', name: 'Paper', vibe: 'Warm planner', primary: '#14203A', accent: '#FFC93C', bg: '#FAF7F0', surface: '#FFFDF8', muted: '#F1EBDD', text: '#1B2236', secondary: '#6B7280' },
+  { id: 'navy-night', name: 'Navy Night', vibe: 'Warm dark', primary: '#14203A', accent: '#FFC93C', bg: '#0E1426', surface: '#17203A', muted: '#1E2A4A', text: '#F2EFE6', secondary: '#9AA5C0' },
   { id: 'kavach-classic', name: 'Kavach Classic', vibe: 'Banking trust', primary: '#0F172A', accent: '#FBBF24', bg: '#FFFFFF', surface: '#FFFFFF', muted: '#F1F5F9', text: '#0F172A', secondary: '#64748B' },
   { id: 'midnight-shield', name: 'Midnight Shield', vibe: 'Dark mode premium', primary: '#0F172A', accent: '#2DD4BF', bg: '#020617', surface: '#0F172A', muted: '#1E293B', text: '#E2E8F0', secondary: '#94A3B8' },
   { id: 'surgeon-mint', name: 'Surgeon Mint', vibe: 'Fresh growth', primary: '#059669', accent: '#34D399', bg: '#ECFDF5', surface: '#FFFFFF', muted: '#D1FAE5', text: '#064E3B', secondary: '#047857' },
@@ -29,11 +31,11 @@ export const THEMES: Theme[] = [
 export const THEME_STORAGE_KEY = 'fin_theme'
 
 export function getTheme(id?: string): Theme {
-  const found = THEMES.find((t) => t.id === id) ?? THEMES.find((t) => t.id === 'indigo-night') ?? THEMES[0]
+  const found = THEMES.find((t) => t.id === id) ?? THEMES.find((t) => t.id === 'paper') ?? THEMES[0]
   return found
 }
 
-export function applyTheme(id: string): void {
+function applyVars(id: string): Theme {
   const t = getTheme(id)
   const root = document.documentElement
   root.setAttribute('data-theme', t.id)
@@ -44,23 +46,18 @@ export function applyTheme(id: string): void {
   root.style.setProperty('--text-secondary', t.secondary)
   root.style.setProperty('--brand', t.primary)
   root.style.setProperty('--accent', t.accent)
+  return t
+}
+
+export function applyTheme(id: string): void {
+  const t = applyVars(id)
   try { localStorage.setItem(THEME_STORAGE_KEY, t.id) } catch { /* noop */ }
 }
 
 export function applySystemTheme(): void {
   if (typeof window === 'undefined') return
-  const dark = window.matchMedia?.('(prefers-color-scheme: dark)').matches ?? true
-  const id = dark ? 'indigo-night' : 'indigo-dawn'
-  const t = getTheme(id)
-  const root = document.documentElement
-  root.setAttribute('data-theme', t.id)
-  root.style.setProperty('--bg', t.bg)
-  root.style.setProperty('--surface', t.surface)
-  root.style.setProperty('--surface-muted', t.muted)
-  root.style.setProperty('--text-primary', t.text)
-  root.style.setProperty('--text-secondary', t.secondary)
-  root.style.setProperty('--brand', t.primary)
-  root.style.setProperty('--accent', t.accent)
+  const dark = window.matchMedia?.('(prefers-color-scheme: dark)').matches ?? false
+  applyVars(dark ? 'navy-night' : 'paper')
 }
 
 const THEME_KEY = 'fin_theme'
@@ -68,8 +65,8 @@ const THEME_KEY = 'fin_theme'
 export function readStoredTheme(): string {
   try {
     const v = localStorage.getItem(THEME_STORAGE_KEY) ?? localStorage.getItem('theme')
-    return v ?? 'indigo-night'
-  } catch { return 'indigo-night' }
+    return v ?? 'paper'
+  } catch { return 'paper' }
 }
 
 export function storeTheme(id: string): void {
@@ -85,19 +82,21 @@ export function useTheme(): [Theme, (id: string) => void] {
   return [theme, change]
 }
 
+const AUTO_ID = 'auto'
+
+const SEGMENTS = [
+  { id: AUTO_ID, label: 'Auto (follow system)' },
+  { id: 'paper', label: 'Paper' },
+  { id: 'navy-night', label: 'Navy Night' },
+]
+
 export function ThemePicker({ value, onChange }: { value: string; onChange: (id: string) => void }) {
-  const isAuto = value === 'auto'
-  const selectedId = isAuto ? 'indigo-night' : value
+  const isAuto = value === AUTO_ID
+  const selectedId = isAuto ? 'paper' : value
 
   const previewThemes = [
-    { id: 'indigo-night', name: 'Indigo Night', vibe: 'Premium dark', bg: '#0E1022', card: '#171A33', accent: '#F59E3B', dark: true },
-    { id: 'indigo-dawn', name: 'Indigo Dawn', vibe: 'Soft light', bg: '#F6F5FB', card: '#FFFFFF', accent: '#D97706', dark: false },
-  ]
-
-  const SEGMENTS = [
-    { id: 'auto', label: 'Auto (follow system)' },
-    { id: 'indigo-night', label: 'Indigo Night' },
-    { id: 'indigo-dawn', label: 'Indigo Dawn' },
+    { id: 'paper', name: 'Paper', vibe: 'Warm planner', bg: '#FAF7F0', card: '#FFFDF8', accent: '#FFC93C', dark: false },
+    { id: 'navy-night', name: 'Navy Night', vibe: 'Warm dark', bg: '#0E1426', card: '#17203A', accent: '#FFC93C', dark: true },
   ]
 
   const [reducedMotion, setReducedMotion] = useState(false)
@@ -116,7 +115,7 @@ export function ThemePicker({ value, onChange }: { value: string; onChange: (id:
               key={t.id}
               type="button"
               onClick={() => onChange(t.id)}
-              className="rounded-2xl p-3 text-left transition-transform active:scale-95"
+              className="rounded-[10px] p-3 text-left transition-transform active:scale-95"
               style={{ background: 'var(--surface)', border: `2px solid ${selected ? 'var(--kavach-gold)' : 'var(--surface-muted)'}` }}
             >
               <div className="h-20 rounded-xl overflow-hidden relative mb-2" style={{ background: t.bg, border: '1px solid rgba(0,0,0,0.06)' }}>
@@ -149,9 +148,9 @@ export function ThemePicker({ value, onChange }: { value: string; onChange: (id:
               <button
                 key={s.id}
                 type="button"
-                onClick={() => { if (s.id === 'auto') applySystemTheme(); else onChange(s.id) }}
+                onClick={() => { if (s.id === AUTO_ID) applySystemTheme(); else onChange(s.id) }}
                 className="relative rounded-full py-2 text-xs font-semibold"
-                style={{ background: active ? 'linear-gradient(135deg, #4338CA, #6366F1)' : 'transparent', color: active ? '#fff' : 'var(--text-secondary)' }}
+                style={{ background: active ? 'linear-gradient(135deg, #14203A, #1E2A4A)' : 'transparent', color: active ? '#FFFDF8' : 'var(--text-secondary)' }}
               >
                 {s.label}
               </button>
@@ -169,8 +168,8 @@ export function ThemePicker({ value, onChange }: { value: string; onChange: (id:
           style={{ background: 'var(--surface)', border: '1px solid var(--surface-muted)' }}
         >
           <span className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>Reduced Motion</span>
-          <span className="h-6 w-11 rounded-full p-0.5 transition-colors" style={{ background: reducedMotion ? 'linear-gradient(135deg, #4338CA, #6366F1)' : 'var(--surface-muted)' }}>
-            <span className="block h-5 w-5 rounded-full transition-transform" style={{ background: '#fff', transform: reducedMotion ? 'translateX(20px)' : 'translateX(0)', boxShadow: '0 1px 3px rgb(0 0 0 / 0.2)' }} />
+          <span className="h-6 w-11 rounded-full p-0.5 transition-colors" style={{ background: reducedMotion ? 'linear-gradient(135deg, #14203A, #1E2A4A)' : 'var(--surface-muted)' }}>
+            <span className="block h-5 w-5 rounded-full transition-transform" style={{ background: '#FFFDF8', transform: reducedMotion ? 'translateX(20px)' : 'translateX(0)', boxShadow: '0 1px 3px rgb(0 0 0 / 0.2)' }} />
           </span>
         </button>
         <button
@@ -180,8 +179,8 @@ export function ThemePicker({ value, onChange }: { value: string; onChange: (id:
           style={{ background: 'var(--surface)', border: '1px solid var(--surface-muted)' }}
         >
           <span className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>Hindi Language</span>
-          <span className="h-6 w-11 rounded-full p-0.5 transition-colors" style={{ background: hindi ? 'linear-gradient(135deg, #4338CA, #6366F1)' : 'var(--surface-muted)' }}>
-            <span className="block h-5 w-5 rounded-full transition-transform" style={{ background: '#fff', transform: hindi ? 'translateX(20px)' : 'translateX(0)', boxShadow: '0 1px 3px rgb(0 0 0 / 0.2)' }} />
+          <span className="h-6 w-11 rounded-full p-0.5 transition-colors" style={{ background: hindi ? 'linear-gradient(135deg, #14203A, #1E2A4A)' : 'var(--surface-muted)' }}>
+            <span className="block h-5 w-5 rounded-full transition-transform" style={{ background: '#FFFDF8', transform: hindi ? 'translateX(20px)' : 'translateX(0)', boxShadow: '0 1px 3px rgb(0 0 0 / 0.2)' }} />
           </span>
         </button>
       </div>

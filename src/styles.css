@@ -1,59 +1,100 @@
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Geist:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Sora:wght@400;600;700;800&family=Geist:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Caveat:wght@600;700&display=swap');
 @import "tailwindcss";
 
 @theme {
   --font-sans: "Inter", "Geist", system-ui, sans-serif;
-  --font-display: "Plus Jakarta Sans", "Geist", sans-serif;
+  --font-display: "Plus Jakarta Sans", "Sora", "Geist", sans-serif;
+  --font-hand: "Caveat", cursive;
   --font-mono: "JetBrains Mono", ui-monospace, monospace;
 
   --animate-fade-up: fadeUp 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
   --animate-shake: shake 0.45s ease-in-out 3;
   --animate-red-pulse: redPulse 1.6s ease-in-out infinite;
-  --animate-gold-pulse: goldPulse 2.2s ease-in-out infinite;
   --animate-scan: scanY 0.9s ease-in-out infinite;
-  --animate-mesh: meshDrift 18s ease-in-out infinite alternate;
-  --animate-float: floaty 6s ease-in-out infinite;
   --animate-blink: blinkDot 1.2s ease-in-out infinite;
-  --animate-breathe: breathe 3.2s ease-in-out infinite;
 }
 
 @keyframes fadeUp { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
 @keyframes shake { 0%, 100% { transform: translateX(0); } 20% { transform: translateX(-2.5px); } 40% { transform: translateX(2.5px); } 60% { transform: translateX(-2px); } 80% { transform: translateX(2px); } }
 @keyframes redPulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.35); } 50% { box-shadow: 0 0 0 9px rgba(239, 68, 68, 0); } }
-@keyframes goldPulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.55; } }
 @keyframes scanY { 0%, 100% { top: 0; } 50% { top: 100%; } }
-@keyframes meshDrift { 0% { background-position: 0% 0%; } 100% { background-position: 100% 100%; } }
-@keyframes floaty { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
 @keyframes blinkDot { 0%, 80%, 100% { opacity: 0.3; transform: translateY(0); } 40% { opacity: 1; transform: translateY(-3px); } }
-@keyframes breathe { 0%, 100% { box-shadow: 0 0 0 0 rgba(165, 180, 252, 0.45); } 50% { box-shadow: 0 0 22px 3px rgba(165, 180, 252, 0.45); } }
 @keyframes confettiFly { 0% { opacity: 1; transform: translate(0, 0) rotate(0deg); } 100% { opacity: 0; transform: translate(var(--dx, 24px), var(--dy, -64px)) rotate(540deg); } }
 @keyframes rippleFlash { to { transform: scale(2.4); opacity: 0.7; } }
 
-/* ============ FinKavach Design Tokens ============ */
+/* ============ FinKavach Design Tokens — "Paper" (default) & "Navy Night" ============ */
 :root {
-  --kavach-navy: #0F172A;
-  --kavach-gold: #FBBF24;
+  --kavach-navy: #14203A;
+  --kavach-gold: #FFC93C;
   --shield-teal: #0D9488;
   --shield-teal-hi: #5EEAD4;
   --surgeon-emerald: #059669;
   --surgeon-emerald-hi: #34D399;
   --chat-indigo: #6366F1;
   --chat-indigo-hi: #A5B4FC;
-  --bg: #FFFFFF;
-  --surface: #FFFFFF;
-  --surface-muted: #F1F5F9;
-  --text-primary: #0F172A;
-  --text-secondary: #64748B;
-  --success: #10B981;
-  --warning: #F59E0B;
-  --danger: #EF4444;
-  --grad-shield: linear-gradient(135deg, #0D9488, #5EEAD4);
-  --grad-surgeon: linear-gradient(135deg, #059669, #34D399);
-  --grad-chat: linear-gradient(135deg, #6366F1, #A5B4FC);
-  --grad-gold: linear-gradient(135deg, #FBBF24, #FDE68A);
-  --font-display: "Plus Jakarta Sans", "Geist", sans-serif;
+  --bg: #FAF7F0;
+  --surface: #FFFDF8;
+  --surface-muted: #F1EBDD;
+  --border: #E8E2D3;
+  --text: #1B2236;
+  --text-2: #6B7280;
+  --text-primary: #1B2236;
+  --text-secondary: #6B7280;
+  --success: #2E9E6B;
+  --warning: #D97706;
+  --danger: #E5484D;
+  --gold-soft: rgba(255, 201, 60, 0.55);
+  --pink-soft: #FBE0E3;
+  --note-green: #D9E8A6;
+  --sidebar-bg: #14203A;
+  --font-display: "Plus Jakarta Sans", "Sora", sans-serif;
   --font-sans: "Inter", "Geist", system-ui, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, monospace;
+  --font-hand: "Caveat", cursive;
+}
+
+/* Theme: Paper — warm cream paper, planner-card feel (DEFAULT) */
+[data-theme='paper'] {
+  --bg: #FAF7F0;
+  --surface: #FFFDF8;
+  --surface-muted: #F1EBDD;
+  --border: #E8E2D3;
+  --text: #1B2236;
+  --text-2: #6B7280;
+  --text-primary: #1B2236;
+  --text-secondary: #6B7280;
+  --brand: #14203A;
+  --accent: #FFC93C;
+  --kavach-gold: #FFC93C;
+  --sidebar-bg: #14203A;
+  --success: #2E9E6B;
+  --success-soft: #DDF3E6;
+  --danger: #E5484D;
+  --gold-soft: rgba(255, 201, 60, 0.55);
+  --pink-soft: #FBE0E3;
+  --note-green: #D9E8A6;
+}
+
+/* Theme: Navy Night — warm dark navy, same marigold accent */
+[data-theme='navy-night'] {
+  --bg: #0E1426;
+  --surface: #17203A;
+  --surface-muted: #1E2A4A;
+  --border: #263350;
+  --text: #F2EFE6;
+  --text-2: #9AA5C0;
+  --text-primary: #F2EFE6;
+  --text-secondary: #9AA5C0;
+  --brand: #14203A;
+  --accent: #FFC93C;
+  --kavach-gold: #FFC93C;
+  --sidebar-bg: #14203A;
+  --success: #3ECF8E;
+  --success-soft: rgba(46, 158, 107, 0.22);
+  --danger: #F26D6D;
+  --gold-soft: rgba(255, 201, 60, 0.55);
+  --pink-soft: rgba(251, 224, 227, 0.14);
+  --note-green: rgba(217, 232, 166, 0.28);
 }
 
 /* ---- Curated themes (8) ---- */
@@ -72,42 +113,85 @@
   * { -webkit-tap-highlight-color: transparent; }
   html, body { overscroll-behavior-y: contain; }
   body {
-    background: linear-gradient(180deg, var(--bg) 0%, var(--surface-muted) 420px) fixed;
     background-color: var(--bg);
     color: var(--text-primary);
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
   }
+  /* Subtle paper grain — keeps the cream from reading as flat digital fill */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 2147483000;
+    opacity: 0.05;
+    mix-blend-mode: multiply;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)' opacity='0.55'/%3E%3C/svg%3E");
+  }
 }
 
 @layer components {
   .btn-primary {
-    position: relative; overflow: hidden; border-radius: 0.5rem;
-    background: linear-gradient(135deg, var(--kavach-navy), #1E293B);
-    color: #fff; font-weight: 600; padding-top: 0.625rem; padding-bottom: 0.625rem;
-    padding-left: 1rem; padding-right: 1rem; font-size: 0.875rem; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+    border-radius: 6px;
+    background: var(--kavach-navy);
+    color: #FFFDF8; font-weight: 600; padding-top: 0.625rem; padding-bottom: 0.625rem;
+    padding-left: 1rem; padding-right: 1rem; font-size: 0.875rem;
+    border: 1px solid #0E1830;
+    transition: background 0.2s ease, transform 0.15s ease;
   }
+  .btn-primary:hover { background: #1E2A4A; }
+  .btn-primary:active { transform: translateY(1px); }
   .btn-gold {
-    position: relative; overflow: hidden; border-radius: 0.5rem;
-    background: linear-gradient(135deg, var(--kavach-gold), #FDE68A);
+    border-radius: 6px;
+    background: var(--kavach-gold);
     color: var(--kavach-navy); font-weight: 700; padding-top: 0.625rem; padding-bottom: 0.625rem;
-    padding-left: 1rem; padding-right: 1rem; font-size: 0.875rem; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.25);
+    padding-left: 1rem; padding-right: 1rem; font-size: 0.875rem;
+    border: 1px solid #E8B01F;
+    transition: background 0.2s ease, transform 0.15s ease;
   }
+  .btn-gold:hover { background: #FFD45E; }
+  .btn-gold:active { transform: translateY(1px); }
   .btn-outline { background: var(--surface); border: 1px solid #e2e8f0; border-radius: 0.5rem; color: #334155; font-weight: 500; padding-top: 0.5rem; padding-bottom: 0.5rem; padding-left: 0.75rem; padding-right: 0.75rem; font-size: 0.875rem; box-shadow: 0 1px 2px rgb(0 0 0 / 0.05); }
   .btn-ghost { color: #475569; padding-top: 0.5rem; padding-bottom: 0.5rem; padding-left: 0.5rem; padding-right: 0.5rem; border-radius: 0.5rem; font-weight: 500; }
-  .card { background: var(--surface); border: 1px solid #e2e8f0; border-radius: 0.75rem; box-shadow: 0 4px 14px -6px rgb(15 23 42 / 0.10); padding: 0.875rem; display: flex; flex-direction: column; gap: 0.75rem; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 0.875rem; display: flex; flex-direction: column; gap: 0.75rem; }
   .stat { font-family: var(--font-mono); font-weight: 500; font-size: 1.25rem; color: var(--text-primary); }
   .text-display { font-family: var(--font-display); }
   .text-mono-rupee { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+  .font-hand { font-family: var(--font-hand); }
+  .marker-stripe {
+    background: linear-gradient(90deg, rgba(255, 201, 60, 0.55) 0%, rgba(255, 201, 60, 0.55) 100%);
+    padding: 0 0.2em;
+    border-radius: 0.15em;
+    box-decoration-break: clone;
+    -webkit-box-decoration-break: clone;
+    transform: rotate(-0.7deg);
+    display: inline-block;
+  }
+  .btn-marigold {
+    position: relative; border-radius: 6px;
+    background: #FFC93C;
+    border: 1px solid #E8B01F;
+    color: #14203A; font-weight: 700; padding-top: 0.7rem; padding-bottom: 0.7rem;
+    padding-left: 1.25rem; padding-right: 1.25rem; font-size: 0.875rem;
+    box-shadow: 0 1px 0 rgba(20, 32, 58, 0.25);
+    transition: background 0.2s ease, transform 0.15s ease, box-shadow 0.15s ease;
+  }
+  .btn-marigold:hover { background: #FFD45E; }
+  .btn-marigold:active { transform: translateY(1px); box-shadow: none; }
+  .sidebar-kavach { background: var(--sidebar-bg); color: var(--text-primary); }
+  .note-green { background: var(--note-green); }
+  .pink-soft { background: var(--pink-soft); }
+  .success-soft { background: var(--success-soft); }
 }
 
 /* Ripple on tap (CSS ::after flash) */
-.btn-primary::after, .btn-gold::after, .btn-ghost::after {
+.btn-ghost::after {
   content: ''; position: absolute; inset: 0; border-radius: inherit;
   background: radial-gradient(circle at center, rgba(255, 255, 255, 0.45) 0%, transparent 60%);
   transform: scale(0); opacity: 0; pointer-events: none;
 }
-.btn-primary:active::after, .btn-gold:active::after, .btn-ghost:active::after { animation: rippleFlash 0.4s ease-out; }
+.btn-ghost:active::after { animation: rippleFlash 0.4s ease-out; }
 
 @keyframes fadeDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
 .toast-in { animation: fadeDown 0.25s ease both; }

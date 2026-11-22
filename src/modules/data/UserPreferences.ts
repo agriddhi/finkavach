@@ -40,14 +40,16 @@ export class ToolPrefsClass {
       sessionId: undefined,
       toolNames: ['UserProfile', 'Sessions', 'Tools', 'Firebase', 'Palette'],
       acRole: 3,
-      llmApiKey: '',
-      llmModel: 'gpt-4o-mini',
+      // LLM config comes from .env (VITE_LLM_*); stored overrides win when set.
+      llmApiKey: import.meta.env.VITE_LLM_API_KEY ?? '',
+      llmModel: import.meta.env.VITE_LLM_MODEL ?? 'gpt-4o-mini',
     }
   }
 
   onboard(): { label: string } | null {
     const prefs = this.toolPrefs ?? this.defaults()
-    return prefs.name === '' ? { label: 'Choose your scenario (ToolSixQuestions)' } : null
+    // Friendly onboarding label — no dev strings.
+    return prefs.name === '' ? { label: 'Salaried · India' } : null
   }
 
   fromLocalStorage(): ToolPrefs {
@@ -58,7 +60,11 @@ export class ToolPrefsClass {
       return base
     }
     try {
-      this.toolPrefs = { ...base, ...(JSON.parse(raw) as ToolPrefs) }
+      const merged: ToolPrefs = { ...base, ...(JSON.parse(raw) as ToolPrefs) }
+      // Stored legacy values (empty key / retired scaffold model) must not shadow the env defaults.
+      if (!merged.llmApiKey) merged.llmApiKey = base.llmApiKey
+      if (!merged.llmModel || merged.llmModel === 'gpt-4o-mini') merged.llmModel = base.llmModel
+      this.toolPrefs = merged
     } catch {
       this.toolPrefs = base
     }

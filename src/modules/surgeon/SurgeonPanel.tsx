@@ -1,13 +1,14 @@
 // SurgeonPanel — the Tax/Surgeon Mode screen (Design Spec §4): bento grid on desktop, single column on mobile.
 import { useMemo, useState, useRef } from 'react'
 import { motion } from 'framer-motion'
-import { TrendingUp, Bot, Sparkles, IndianRupee, ArrowDown, ArrowUp } from 'lucide-react'
+import { TrendingUp, Bot, Sparkles, IndianRupee, ArrowDown, ArrowUp, Home, ShieldCheck } from 'lucide-react'
 import { Card } from '@/modules/ui/widgets/Table'
 import { HeroStat } from '@/modules/ui/widgets/HeroStat'
 import { StreamingChat } from '@/modules/chat/StreamChatModule'
 import { ToolPrefsClass } from '@/modules/data/UserPreferences'
 import { TaxEngine } from '@/modules/surgeon/TaxEngine'
 import { TAX_SLABS_OLD, TAX_SLABS_NEW, OLD_STANDARD_DEDUCTION, NEW_STANDARD_DEDUCTION, OLD_BASIC_EXEMPTION_LIMIT } from '@/modules/surgeon/TaxData'
+import { formatINR } from '@/modules/finance/format'
 
 const SUGGESTIONS = [
   'Is New Regime better for me?',
@@ -56,9 +57,9 @@ function Sparkline({ values, color }: { values: number[]; color: string }) {
 }
 
 const WAYS = [
-  { icon: '📈', title: 'Invest in 80C', amount: 150000, saving: 45000 },
-  { icon: '🏠', title: 'HRA exemption', amount: 200000, saving: 60000 },
-  { icon: '🛡️', title: 'NPS 80CCD(1B)', amount: 50000, saving: 15000 },
+  { icon: TrendingUp, title: 'Invest in 80C', amount: 150000, saving: 45000 },
+  { icon: Home, title: 'HRA exemption', amount: 200000, saving: 60000 },
+  { icon: ShieldCheck, title: 'NPS 80CCD(1B)', amount: 50000, saving: 15000 },
 ]
 
 export function SurgeonPanel(props: { onAskAI: (preset?: string) => void }) {
@@ -79,7 +80,7 @@ export function SurgeonPanel(props: { onAskAI: (preset?: string) => void }) {
   const automatedHours = Math.max(0.25, hours * 0.2)
   const savedHours = Math.max(0, hours - automatedHours)
 
-  const inr = (n: number) => `₹${n.toLocaleString('en-IN')}`
+  const inr = (n: number) => formatINR(n)
 
   const oldSpark = [oldTax * 0.9, oldTax * 0.95, oldTax, oldTax * 0.98, oldTax]
   const newSpark = [newTax * 1.05, newTax * 1.02, newTax, newTax * 0.99, newTax]
@@ -104,7 +105,7 @@ export function SurgeonPanel(props: { onAskAI: (preset?: string) => void }) {
           <div className="relative flex flex-col sm:flex-row sm:items-center gap-4">
             <div className="flex-1">
               <p className="text-xs font-semibold" style={{ color: 'rgba(241,242,250,0.6)' }}>You save</p>
-              <HeroStat value={Math.max(0, savings)} prefix="₹" />
+              <HeroStat value={Math.max(0, savings)} />
               <p className="text-[11px] font-medium mt-1" style={{ color: 'rgba(241,242,250,0.6)' }}>Estimated yearly tax savings</p>
             </div>
             <div className="flex items-center gap-3">
@@ -168,7 +169,7 @@ export function SurgeonPanel(props: { onAskAI: (preset?: string) => void }) {
               <Sparkline values={oldSpark} color="#9AA0C3" />
             </div>
             <p className="font-mono text-2xl font-bold" style={{ color: 'var(--text-secondary)' }}>{inr(oldTax)}</p>
-            <p className="text-[11px] mt-1" style={{ color: 'var(--text-secondary)' }}>incl. standard deduction ₹75,000</p>
+            <p className="text-[11px] mt-1" style={{ color: 'var(--text-secondary)' }}>incl. standard deduction {formatINR(NEW_STANDARD_DEDUCTION)}</p>
           </div>
 
           {/* New Regime tile */}
@@ -184,7 +185,7 @@ export function SurgeonPanel(props: { onAskAI: (preset?: string) => void }) {
               <Sparkline values={newSpark} color="#FBBF24" />
             </div>
             <p className="font-mono text-2xl font-bold" style={{ color: '#FBBF24' }}>{inr(newTax)}</p>
-            <p className="text-[11px] mt-1" style={{ color: 'rgba(241,242,250,0.6)' }}>incl. standard deduction ₹75,000</p>
+            <p className="text-[11px] mt-1" style={{ color: 'rgba(241,242,250,0.6)' }}>incl. standard deduction {formatINR(NEW_STANDARD_DEDUCTION)}</p>
           </div>
 
           {/* Saffron pill overlapping seam */}
@@ -222,16 +223,19 @@ export function SurgeonPanel(props: { onAskAI: (preset?: string) => void }) {
           <Card>
             <h3 className="font-display font-bold text-lg" style={{ color: 'var(--text-primary)' }}>Ways to save more</h3>
             <div className="space-y-2 mt-2">
-              {WAYS.map((w) => (
+              {WAYS.map((w) => {
+                const WI = w.icon
+                return (
                 <div key={w.title} className="flex items-center gap-3 rounded-xl p-2" style={{ background: 'var(--surface-muted)' }}>
-                  <span className="h-9 w-9 rounded-lg flex items-center justify-center shrink-0" style={{ background: 'var(--surface)' }}>{w.icon}</span>
+                  <span className="h-9 w-9 rounded-lg flex items-center justify-center shrink-0" style={{ background: 'var(--surface)' }}><WI className="h-4 w-4" style={{ color: '#FBBF24' }} /></span>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-semibold truncate" style={{ color: 'var(--text-primary)' }}>{w.title}</p>
-                    <p className="text-[10px]" style={{ color: 'var(--text-secondary)' }}>up to ₹{w.amount.toLocaleString('en-IN')}</p>
+                    <p className="text-[10px]" style={{ color: 'var(--text-secondary)' }}>up to {formatINR(w.amount)}</p>
                   </div>
                   <span className="text-xs font-bold" style={{ color: '#FBBF24' }}>−{inr(w.saving)}</span>
                 </div>
-              ))}
+                )
+              })}
             </div>
           </Card>
         </div>
