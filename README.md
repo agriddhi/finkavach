@@ -1,4 +1,3 @@
-# 📄 FINIL — FINCTION NOTES
 # FinKavach AI — Personal Finance Assistant — Docs Pack
 
 - **Created**: Tue Nov 19 2026 (mobile-first PWA, `finil/`)
