@@ -4,6 +4,8 @@
 - **Created**: Tue Nov 19 2026 (mobile-first PWA, `finil/`)
 - **Owner**: FinKavach AI
 - **Version**: 1.0
+- **Local dev**: http://localhost:4321
+- **Repo**: https://github.com/agriddhi/finkavach
 
 ---
 
@@ -14,6 +16,8 @@
 > **Surgeon Mode**: "Badhao" — Tax & laziness calculator (Old vs New regime, tax engine, returns)
 > **Chat Mode**: "Ask anything" — LLM-backed chatbot
 
+> **Redesign note (Nov 2026)**: warm "Paper" + "Navy Night" planner themes, editorial ledger UI (hairlines, mono labels, flat fills, 10px radius), mobile-first shell (≥1024px sidebar / <1024px bottom tab bar), installable PWA, Gemini-backed chat.
+
 ---
 
 ## 🛡️ Team
@@ -21,16 +25,51 @@
 | Member | Role | Contact |
 |---|---|---|
 
+---
+
 ## 🛠️ Dev Stack
 
 | Layer | Choice |
 |---|---|
-| Frontend | React 18 + TypeScript + Tailwind + Vite (ESM, no React Compiler yet) |
-| UI Lib | Lucide icons, framer-motion (impl detail) |
-| Server | Vite Dev Server (MSW), Axios (done) |
-| Database | Supabase PostgreSQL (planned), MongoDB (dev) |
+| Frontend | React 18 + TypeScript + Tailwind CSS 4 + Vite 8 + framer-motion + lucide-react |
+| UI style | Editorial ledger: hairline borders, flat fills, mono uppercase micro-labels, 10px radius, paper grain, washi-tape |
+| Server | Vite Dev Server, Vercel (static PWA) |
+| Database | Supabase PostgreSQL (planned) |
 | Hosting | Vercel |
-| AI | OpenAI (gpt-4o-mini), optional Free LLM fallback |
+| AI | **Google Gemini** via OpenAI-compatible endpoint — primary `gemini-3.5-flash-lite`, fallback `gemini-3.5-flash` (`VITE_LLM_*` in `.env`) |
+
+## 🚀 Quick Start
+
+```bash
+npm run dev       # -> http://localhost:4321
+npm run build     # -> dist/
+npm run preview   # -> serve dist/ (PWA SW registers only in prod)
+```
+
+---
+
+## ✨ Features
+
+- **Home**: personalised savings statement + regime ledger (RECOMMENDED sticker, savings ring), sticky note, quick actions
+- **Compare / Surgeon**: Old vs New regime sliders (salary, HRA, 80C, NPS, home loan interest), savings band, breakdown modal
+- **Shield**: SMS scan → SCAM / SAFE / NOT_SURE with evidence + actions (Do NOT click, Call 1930)
+- **Chat**: Gemini Q&A grounded in user income, attaches rules-engine breakdown card
+- **Learn / Profile**: lessons, themes (Paper / Navy Night / Auto)
+
+---
+
+## 🤖 AI Usage
+
+- **Money math** is deterministic (TaxEngine) — AI explains, never computes.
+- LLM: Google Gemini (OpenAI-compatible `/chat/completions`); key/model/base via `VITE_LLM_*` in `.env` (gitignored).
+
+---
+
+## 📱 PWA
+
+- `public/manifest.json`, icons (`favicon-192.png`, `favicon-512.png`, `favicon.svg`, `img/`), `public/sw.js` (network-first + offline shell); service worker registers in production builds only.
+
+---
 
 ## ⏱️ Timeline
 
@@ -61,6 +100,10 @@
 
 | Variable | Purpose |
 |---|---|
+| `VITE_LLM_API_KEY` | Gemini API key (chat) |
+| `VITE_LLM_MODEL` | Primary chat model (`gemini-3.5-flash-lite`) |
+| `VITE_LLM_MODEL_FALLBACK` | Fallback (`gemini-3.5-flash`) |
+| `VITE_LLM_BASE_URL` | Gemini OpenAI-compatible base |
 
 ---
 
